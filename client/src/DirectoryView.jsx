@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const DirectoryView = () => {
     const [directoriesList, setDirectoriesList] = useState([]);
@@ -8,17 +8,26 @@ const DirectoryView = () => {
     const [oldName, setOldName] = useState("");
     const [newName, setNewName] = useState("");
     const [dirname, setDirname] = useState("");
+    const [error, setError] = useState("");
     const inputRef = useRef(null);
     const { dirId } = useParams();
+    const navigate = useNavigate();
 
     async function fetchDirFiles() {
         try {
             const response = await fetch(
-                `http://localhost:4000/directory/${dirId || ""}`
+                `http://localhost:4000/directory/${dirId || ""}`,
+                {
+                    credentials: "include",
+                }
             );
             const data = await response.json();
-            setDirectoriesList(data.directory.content.directories);
-            setFilesList(data.directory.content.files);
+            if (data.success) {
+                setDirectoriesList(data.directory.content.directories);
+                setFilesList(data.directory.content.files);
+            } else {
+                setError(data.message);
+            }
         } catch (error) {
             console.error("Error fetching directory files:", error);
         }
@@ -35,6 +44,7 @@ const DirectoryView = () => {
         const file = e.target.files[0];
         const xhr = new XMLHttpRequest();
         xhr.open("POST", `http://localhost:4000/file/${file.name}`, true);
+        xhr.withCredentials = true;
         xhr.upload.addEventListener("progress", (e) => {
             const percent = (e.loaded / e.total) * 100;
             setProgress(percent.toFixed(2));
@@ -55,6 +65,7 @@ const DirectoryView = () => {
         try {
             await fetch(`http://localhost:4000/file/rename/${id}`, {
                 method: "PATCH",
+                credentials: "include",
                 body: JSON.stringify({ newfilename: newName }),
                 headers: {
                     "Content-Type": "application/json",
@@ -72,6 +83,7 @@ const DirectoryView = () => {
         try {
             await fetch(`http://localhost:4000/file/delete/${id}`, {
                 method: "DELETE",
+                credentials: "include",
             });
             await fetchDirFiles();
         } catch (error) {
@@ -102,6 +114,7 @@ const DirectoryView = () => {
                     "Content-Type": "application/json",
                     dirname,
                 },
+                credentials: "include",
             });
             await fetchDirFiles();
             setDirname("");
@@ -118,6 +131,7 @@ const DirectoryView = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
             });
             await fetchDirFiles();
             setOldName("");
@@ -131,6 +145,7 @@ const DirectoryView = () => {
         try {
             await fetch(`http://localhost:4000/directory/${id}`, {
                 method: "DELETE",
+                credentials: "include",
             });
             await fetchDirFiles();
         } catch (error) {
@@ -138,9 +153,52 @@ const DirectoryView = () => {
         }
     };
 
+    const handleLogOut = async () => {
+        try {
+            const response = await fetch("http://localhost:4000/user/logout", {
+                method: "POST",
+                credentials: "include",
+            });
+            const data = await response.json();
+            console.log(data);
+            if (data.success) {
+                navigate("/login");
+            }
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
+    if (error) {
+        return (
+            <p>
+                {error} go to <Link to={"/login"}>login</Link> page
+            </p>
+        );
+    }
+
     return (
         <div>
-            <h1>My Files</h1>
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 500,
+                }}
+            >
+                <div>
+                    <h1>My Files</h1>
+                </div>
+                <div
+                    style={{
+                        display: "flex",
+                        gap: 12,
+                    }}
+                >
+                    <Link to={"/login"}>Login</Link>
+                    <button onClick={handleLogOut}>logout</button>
+                </div>
+            </div>
             <div>
                 <div>
                     <div style={{ display: "flex", gap: "10px" }}>
