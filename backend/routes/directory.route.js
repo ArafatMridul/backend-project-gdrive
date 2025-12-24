@@ -7,9 +7,11 @@ const router = express.Router();
 
 // get root directory contents
 router.get("/", async (req, res) => {
+    const { uid } = req.cookies;
     try {
-        const rootDirectory = directoryDB.find((dir) => dir.parentId === null);
-        console.log(rootDirectory);
+        const rootDirectory = directoryDB.find(
+            (dir) => dir.parentId === null && dir.userId === uid
+        );
         const files = rootDirectory.content.files.map((fileId) =>
             filesDB.find((file) => file.id === fileId)
         );
@@ -64,9 +66,13 @@ router.get("/:id", async (req, res) => {
 
 // create new directory inisde root directory
 router.post("/", async (req, res) => {
+    const { uid } = req.cookies;
+    // console.log(uid)
     try {
         const { dirname } = req.headers;
-        const parentDirId = directoryDB.find((dir) => dir.parentId === null).id;
+        const parentDirId = directoryDB.find(
+            (dir) => dir.parentId === null && dir.userId === uid
+        ).id;
         const id = crypto.randomUUID();
         directoryDB.push({
             id,
@@ -76,7 +82,10 @@ router.post("/", async (req, res) => {
         });
         const parentDirData = directoryDB.find((dir) => dir.id === parentDirId);
         parentDirData.content.directories.push(id);
-        await writeFile("./directoryDB.json", JSON.stringify(directoryDB, null, 2));
+        await writeFile(
+            "./directoryDB.json",
+            JSON.stringify(directoryDB, null, 2)
+        );
         res.status(201).json({
             success: true,
             message: "Directory created successfully",
@@ -106,7 +115,10 @@ router.post("/:id", async (req, res) => {
         });
         const parentDirData = directoryDB.find((dir) => dir.id === parentDirId);
         parentDirData.content.directories.push(id);
-        await writeFile("./directoryDB.json", JSON.stringify(directoryDB, null, 2));
+        await writeFile(
+            "./directoryDB.json",
+            JSON.stringify(directoryDB, null, 2)
+        );
         res.status(201).json({
             success: true,
             message: "Directory created successfully",
@@ -130,7 +142,10 @@ router.patch("/:id", async (req, res) => {
         const directory = directoryDB.find((dir) => dir.id === id);
         if (directory) {
             directory.name = newdirname;
-            await writeFile("./directoryDB.json", JSON.stringify(directoryDB, null, 2));
+            await writeFile(
+                "./directoryDB.json",
+                JSON.stringify(directoryDB, null, 2)
+            );
             res.status(200).json({
                 success: true,
                 message: "Directory renamed successfully",

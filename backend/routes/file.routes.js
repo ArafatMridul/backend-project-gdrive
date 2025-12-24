@@ -10,9 +10,11 @@ const router = express.Router();
 
 // upload file
 router.post("/:filename", async (req, res) => {
+    const { uid } = req.cookies;
     const parentDirId =
         req.headers.parentdirid ||
-        directoryDB.find((dir) => dir.parentId === null).id;
+        directoryDB.find((dir) => dir.parentId === null && dir.userId === uid)
+            .id;
     try {
         const filename = req.params.filename;
         const id = crypto.randomUUID();
@@ -27,7 +29,10 @@ router.post("/:filename", async (req, res) => {
             );
             parentDirData.content.files.push(id);
             await writeFile("./filesDB.json", JSON.stringify(filesDB, null, 2));
-            await writeFile("./directoryDB.json", JSON.stringify(directoryDB, null, 2));
+            await writeFile(
+                "./directoryDB.json",
+                JSON.stringify(directoryDB, null, 2)
+            );
             res.status(200).json({ success: true, message: "File uploaded" });
         });
     } catch (error) {
@@ -100,7 +105,10 @@ router.delete("/delete/:id", async (req, res) => {
             (fileId) => fileId !== id
         );
         await writeFile("./filesDB.json", JSON.stringify(filesDB, null, 2));
-        await writeFile("./directoryDB.json", JSON.stringify(directoryDB, null, 2));
+        await writeFile(
+            "./directoryDB.json",
+            JSON.stringify(directoryDB, null, 2)
+        );
         await rm(`./storage/${filename}`);
         res.status(200).json({
             success: true,

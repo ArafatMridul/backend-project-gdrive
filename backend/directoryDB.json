@@ -1,11 +1,22 @@
 [
-  {
-    "id": "5acc8e03-05ed-4b3b-85b0-f60b12678f08",
-    "name": "root",
-    "parentId": null,
-    "content": {
-      "files": [],
-      "directories": []
+    {
+        "name": "root-mridul@gmail.com",
+        "id": "e58d0895-b515-45e5-8271-c233ccefdd73",
+        "userId": "1644019b-8dce-45fe-a826-a21a6ff9e132",
+        "parentId": null,
+        "content": {
+            "files": [],
+            "directories": []
+        }
+    },
+    {
+        "name": "root-mridul2@gmail.com",
+        "id": "5c036ec8-aae4-437e-bdf1-e914e9d89acc",
+        "userId": "48ebf75b-89da-4966-9030-fbd60ad347f8",
+        "parentId": null,
+        "content": {
+            "files": ["aa20d8a4-515a-4fc0-a0dc-2f89de1cae58"],
+            "directories": []
+        }
     }
-  }
 ]
