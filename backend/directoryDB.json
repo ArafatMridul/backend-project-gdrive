@@ -15,7 +15,9 @@
         "userId": "48ebf75b-89da-4966-9030-fbd60ad347f8",
         "parentId": null,
         "content": {
-            "files": ["aa20d8a4-515a-4fc0-a0dc-2f89de1cae58"],
+            "files": [
+                "aa20d8a4-515a-4fc0-a0dc-2f89de1cae58"
+            ],
             "directories": []
         }
     }

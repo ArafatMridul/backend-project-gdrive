@@ -22,6 +22,7 @@ const DirectoryView = () => {
                 }
             );
             const data = await response.json();
+            console.log(data);
             if (data.success) {
                 setDirectoriesList(data.directory.content.directories);
                 setFilesList(data.directory.content.files);
@@ -49,6 +50,7 @@ const DirectoryView = () => {
             const percent = (e.loaded / e.total) * 100;
             setProgress(percent.toFixed(2));
         });
+        console.log(dirId);
         xhr.setRequestHeader("parentdirid", dirId || "");
         xhr.send(file);
         xhr.onload = async () => {
@@ -142,6 +144,7 @@ const DirectoryView = () => {
     };
 
     const handleDirectoryDelete = async (id) => {
+        console.log(id)
         try {
             await fetch(`http://localhost:4000/directory/${id}`, {
                 method: "DELETE",
@@ -234,7 +237,7 @@ const DirectoryView = () => {
                     {directoriesList?.map((dir) => {
                         if (!dir) return null;
 
-                        const { name, id } = dir;
+                        const { name, _id: id } = dir;
 
                         return (
                             <li key={id}>
@@ -258,7 +261,7 @@ const DirectoryView = () => {
                     {filesList?.map((file) => {
                         if (!file) return null;
 
-                        const { name, id } = file;
+                        const { name, _id: id } = file;
 
                         return (
                             <li key={id}>
